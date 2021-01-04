@@ -19,12 +19,12 @@ Program vypíše kolik je pro výpočet zvoleno adresních bodů a kontejnerů. 
 ## Princip fungování
 Program načte 2 soubory GeoJSON. Při nenalezení souboru či chybě program skončí. 
 
-Ze souboru `adresy.geojson` si funkce vezme souřadnice, kde prohodí pozici zeměpisné délky a šířky a následně převede souřadnicový systém z WGS 84 na S-JTSK. K jednotlivým souřadnicím si vezme informaci o názvu ulice a čísle popisném. Poté je výstup z funkce uložen do proměnné. 
+Ze souboru `adresy.geojson` si funkce vezme souřadnice, kde prohodí pozici zeměpisné délky a šířky a následně převede souřadnicový systém z WGS 84 na S-JTSK. K jednotlivým souřadnicím si vezme informaci o názvu ulice a čísle popisném.
 
 Ze souboru `kontejnery.geojson` funkce vytřídí jen kontejnery, které mají veřejný přístup. Z těchto vybraných kontejnerů si vezme jejich souřadnice.
-Vybrané souřadnice jsou následně uložené do proměnné.
 
-Ve funkci vzdálenost, kde jsou vstupní parametry souřadnice adresních bodů a kontejnerů, probíhá výpočet vzdálenosti pomocí pythagorovy věty každého adresního bodu od kontejneru. Ve funkci je následně ošetřena chyba dat, kde kdyby byl nejbližší kontejner od adresního bodu vzdálen více jak 10 km, tak by program skončil. Seznam jednotlivých vzdáleností je uložen do proměnné.
+
+Ve funkci vzdálenost, kde jsou vstupní parametry souřadnice adresních bodů a kontejnerů, probíhá výpočet vzdálenosti pomocí pythagorovy věty každého adresního bodu od kontejneru. Ve funkci je následně ošetřena chyba dat, kde kdyby byl nejbližší kontejner od adresního bodu vzdálen více jak 10 km, tak by program skončil.
 
 Dále program hledá maximální vzdálenost nejbližšího kontejneru a počítá průměr a medián.
 
