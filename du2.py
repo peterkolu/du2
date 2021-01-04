@@ -15,6 +15,8 @@ except FileNotFoundError:
 except ValueError:
     print('Soubor s kontejnery je chybný.')
     exit()
+except PermissionError:
+    exit("Není přístup k souboru s kontejnery.")
  
 try:
     with open('adresy.geojson', encoding = 'utf-8') as f:
@@ -26,6 +28,8 @@ except FileNotFoundError:
 except ValueError:
     print('Soubor s adresami je chybný.')
     exit()
+except PermissionError:
+    exit("Není přístup k souboru s adresami.")
 
 
 # Změna souřadnicového systému
@@ -43,14 +47,12 @@ def adresy(adresy_json):
         ulice = adresa["properties"]["addr:street"]
         cislo= adresa["properties"]["addr:housenumber"]
 
-        sirska, delka = wgs2jtsk.transform(souradnice_adres[1],souradnice_adres[0])
+        sirka, delka = wgs2jtsk.transform(souradnice_adres[1],souradnice_adres[0])
         adresy_nazvy.append(ulice)
         adresy_cp.append(cislo)
-        adresy_souradnice.append([sirska,delka])
+        adresy_souradnice.append([sirka,delka])
            
     return adresy_nazvy, adresy_cp, adresy_souradnice
-# uložení výsledku funkce adres do proměnných označujících názvy ulic s čp a souřadnice adresních bodů.
-nazvy_ulice, cp, souradnice_adresy = adresy(adresy_json)
 
 def kontejnery_verejne(kontejnery_json):
     """Funkce vybere jen kontejnery s veřejným přístupem"""
@@ -65,39 +67,37 @@ def kontejnery_verejne(kontejnery_json):
 
     return verejne_kont
 
-# uložení výsledku funkce na vytřídění veřejných kontejnerů do proměnné.
-souradnice_ver_kontejneru= kontejnery_verejne(kontejnery_json)
-
-
 def vzdalenost (souradnice_ver_kontejneru, souradnice_adresy):
     """ Funkce vypočítá z načtených souřadnic vzdálenost mezi nimi v metrech."""
-    zobrazeni_vzdalenosti = []
+    seznam_vzdalenosti = []
 
-    for vypocet_vzdalenosti in souradnice_adresy:
+    for adresy_sour in souradnice_adresy:
         max_vzdalenost = 10000
 
-        for vypocet_vzdalenosti1 in souradnice_ver_kontejneru:
+        for kontejnery_sour in souradnice_ver_kontejneru:
 
-            vzdalenosti = math.sqrt(((vypocet_vzdalenosti[0]-vypocet_vzdalenosti1[0])**2)+((vypocet_vzdalenosti[1]-vypocet_vzdalenosti1[1])**2))
+            vzdalenost = math.sqrt(((adresy_sour[0]-kontejnery_sour [0])**2)+((adresy_sour[1]-kontejnery_sour[1])**2))
 
-            if vzdalenosti < max_vzdalenost:
-                max_vzdalenost = vzdalenosti
+            if vzdalenost < max_vzdalenost:
+                max_vzdalenost = vzdalenost
 
         if max_vzdalenost > 10000:
             print("Nějaký kontejner je k nejbližší adrese dále než 10 km, konec programu.")
             exit()
 
-        zobrazeni_vzdalenosti.append(max_vzdalenost)
+        seznam_vzdalenosti.append(max_vzdalenost)
         
 
-    return zobrazeni_vzdalenosti
+    return seznam_vzdalenosti
 
-# uložení výsledku funkce výpočtu vzdálenosti do proměnné 
+# uložení výstupů fonkcí do proměnných
+nazvy_ulice, cp, souradnice_adresy = adresy(adresy_json)
+souradnice_ver_kontejneru= kontejnery_verejne(kontejnery_json)
 vzdalenost_adres_a_kontejneru = vzdalenost(souradnice_ver_kontejneru, souradnice_adresy)
 
 # nalezení maximální nejbližší vzdálenosti adresního bodu a kontejneru  
 # a oindexování pro následný výpis dané ulice a čísla popisného
-max_nalezena_vzdalenost = vzdalenost_adres_a_kontejneru.index(max(vzdalenost_adres_a_kontejneru))
+max_nalezena_vzdalenost = max(vzdalenost_adres_a_kontejneru)
 index = vzdalenost_adres_a_kontejneru.index(max(vzdalenost_adres_a_kontejneru))
 
 # výpočet průměru a mediánu vzdálenosti
